@@ -1,0 +1,23 @@
+%%%-------------------------------------------------------------------
+%%% -*- coding: utf-8 -*-
+%%% @author Nikita Roshchupkin
+%%% @copyright (C) 2015, Eltex, Novosibirsk, Russia
+%%% @doc
+%%%
+%%% @end
+%%%-------------------------------------------------------------------
+{application, lager,
+    [
+        {description, "Empty Logging Lager2"},
+        {vsn, git},
+        {modules, []},
+        {applications, [
+            kernel,
+            stdlib,
+            chronica
+        ]},
+        {registered, []},
+        {mod, {lager_app, []}},
+        {env, []}
+    ]
+}.
