@@ -3,14 +3,13 @@ Lager_replace это специальное приложение, которое
 Дял всех остальных вызовов устанавливаются заглушки. 
 
 ##Использование
-* Для того, чтобы начать работу с Lager_replace, нужно указать его в зависимостях rebar.config вместо Lager
+* Для того, чтобы начать работу с Lager_replace, нужно указать его в зависимостях rebar.config вместо Lager<br>
 Пример:
 ```erlang
 {deps, [
     {lager, ".*", {git, "git@github.com:eltex-ecss/lager_replace.git"}}
 ]}.
 ```
-<br>
 * Настроить sys.config, в соотвествии с ниже указынными данными
 ```erlang
 Tag :: atom().
