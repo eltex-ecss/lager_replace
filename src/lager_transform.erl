@@ -189,14 +189,14 @@ fun_arity(Level, Iface, Module, Line, File, ICall, Acc, Arity) ->
                 {arity_one, String} ->
                     fun_arity_one(Priority, Iface, Tags, Module, Line, File, Acc, String);
                 {arity_two, String, Args} ->
-                    fun_arity_two(Priority, Iface, Tags, Module, Line, File, Acc, String, Args);
+                    fun_arity_two(Priority, Iface, Tags, Module, Line, File, Acc, String, convert_to_list(Args, Line));
                 {arity_three, String, Args, ASTTags} ->
                     case asttags2list(ASTTags, Line, File) of
                         false ->
                             {ast("ok.", Line), [Tags|Acc]};
                         ResultASTTags ->
                             Tags2 = Tags ++ ResultASTTags,
-                            fun_arity_three(Priority, Iface, Tags2, Module, Line, File, Acc, String, Args)
+                            fun_arity_three(Priority, Iface, Tags2, Module, Line, File, Acc, String, convert_to_list(Args, Line))
                     end;
                 {arity_absorption} ->
                     {ast("ok.", Line), [Tags|Acc]}
@@ -271,6 +271,11 @@ parse_str_debug(Str) ->
              end,
     ResStr = pt_lib:ast2str(ResAST),
     io:format("\""++ResStr++"\"", []).
+
+convert_to_list(Args, _) when pt_lib:is_list(Args) ->
+    Args;
+convert_to_list(Args, Line) ->
+    {cons, Line, Args, {nil, Line}}.
 
 check_log_params({string, Line, Format}, Args, _) when pt_lib:is_list(Args) ->
     case catch pt_lib:list_length(Args) of
