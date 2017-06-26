@@ -180,7 +180,7 @@ wrapParam(Param) ->
         false -> ast("fun () -> $Param end.", 0)
     end.
 
-fun_arity(Level, Iface, Module, Line, File, ICall, Acc, Arity) ->
+fun_arity(Level, Iface, Module, Line, File, _ICall, Acc, Arity) ->
     case mapFunToPriority(Level) of
         {ok, RTags, Priority} ->
             LogId = log_id(Module, Line),
@@ -191,13 +191,14 @@ fun_arity(Level, Iface, Module, Line, File, ICall, Acc, Arity) ->
                 {arity_two, String, Args} ->
                     fun_arity_two(Priority, Iface, Tags, Module, Line, File, Acc, String, convert_to_list(Args, Line));
                 {arity_three, String, Args, ASTTags} ->
-                    case asttags2list(ASTTags, Line, File) of
-                        false ->
-                            {ast("ok.", Line), [Tags|Acc]};
-                        ResultASTTags ->
-                            Tags2 = Tags ++ ResultASTTags,
-                            fun_arity_three(Priority, Iface, Tags2, Module, Line, File, Acc, String, convert_to_list(Args, Line))
-                    end;
+                    Tags2 =
+                        case asttags2list(ASTTags) of
+                            false ->
+                                [dynamical_tag | Tags];
+                            ResultASTTags ->
+                                Tags ++ ResultASTTags
+                        end,
+                    fun_arity_three(Priority, Iface, Tags2, Module, Line, File, Acc, String, convert_to_list(Args, Line));
                 {arity_absorption} ->
                     {ast("ok.", Line), [Tags|Acc]}
             end;
@@ -207,7 +208,7 @@ fun_arity(Level, Iface, Module, Line, File, ICall, Acc, Arity) ->
             {ast("ok.", Line), [Tags|Acc]}
     end.
 
-asttags2list(Tags, Line, File) ->
+asttags2list(Tags) ->
     case pt_lib:is_term(Tags) of
         true ->
             _NewTags =
@@ -222,9 +223,6 @@ asttags2list(Tags, Line, File) ->
                     erlang:error(E)
             end;
         false ->
-            {ok, Cwd} = file:get_cwd(),
-            FullFile = filename:join(Cwd, File),
-            io:format("~ts:~p: Warning: non static log tags are forbidden ~n", [FullFile, Line]),
             false
     end.
 
